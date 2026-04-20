@@ -3,11 +3,13 @@ import { useState, useRef, useCallback } from 'react';
 const ROWS = 40;
 const COLS = 60;
 
-function emptyGrid() {
-  return Array.from({ length: ROWS }, () => new Array(COLS).fill(0));
+type Grid = number[][];
+
+function emptyGrid(): Grid {
+  return Array.from({ length: ROWS }, () => new Array<number>(COLS).fill(0));
 }
 
-function nextGeneration(grid) {
+function nextGeneration(grid: Grid): Grid {
   return grid.map((row, r) =>
     row.map((cell, c) => {
       let neighbors = 0;
@@ -27,13 +29,26 @@ function nextGeneration(grid) {
   );
 }
 
-export function useGameOfLife() {
-  const [grid, setGrid] = useState(emptyGrid);
+export interface GameOfLifeState {
+  grid: Grid;
+  running: boolean;
+  generation: number;
+  ROWS: number;
+  COLS: number;
+  toggleCell: (r: number, c: number) => void;
+  start: () => void;
+  stop: () => void;
+  clear: () => void;
+  randomize: () => void;
+}
+
+export function useGameOfLife(): GameOfLifeState {
+  const [grid, setGrid] = useState<Grid>(emptyGrid);
   const [running, setRunning] = useState(false);
   const [generation, setGeneration] = useState(0);
   const runningRef = useRef(false);
 
-  const toggleCell = useCallback((r, c) => {
+  const toggleCell = useCallback((r: number, c: number) => {
     if (runningRef.current) return;
     setGrid(g => {
       const next = g.map(row => [...row]);
@@ -44,10 +59,7 @@ export function useGameOfLife() {
 
   const runSimulation = useCallback(() => {
     if (!runningRef.current) return;
-    setGrid(g => {
-      const next = nextGeneration(g);
-      return next;
-    });
+    setGrid(g => nextGeneration(g));
     setGeneration(n => n + 1);
     setTimeout(runSimulation, 100);
   }, []);
