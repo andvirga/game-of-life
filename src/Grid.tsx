@@ -1,5 +1,4 @@
 import { useCallback, useRef } from 'react';
-import styles from './Grid.module.css';
 
 interface GridProps {
   grid: number[][];
@@ -35,8 +34,11 @@ export default function Grid({ grid, onToggle, rows, cols }: GridProps) {
 
   return (
     <div
-      className={styles.grid}
-      style={{ '--cols': cols, '--rows': rows } as React.CSSProperties}
+      className="grid gap-px bg-[#1a1a2e] border border-[#16213e] rounded select-none cursor-crosshair"
+      style={{
+        gridTemplateColumns: `repeat(${cols}, 14px)`,
+        gridTemplateRows: `repeat(${rows}, 14px)`,
+      }}
       onMouseLeave={handleMouseUp}
       onMouseUp={handleMouseUp}
     >
@@ -44,7 +46,11 @@ export default function Grid({ grid, onToggle, rows, cols }: GridProps) {
         row.map((cell, c) => (
           <div
             key={`${r}-${c}`}
-            className={`${styles.cell} ${cell ? styles.alive : ''}`}
+            className={`w-3.5 h-3.5 rounded-sm transition-colors duration-[50ms] ${
+              cell
+                ? 'bg-[#e94560] shadow-[0_0_4px_#e94560aa]'
+                : 'bg-[#0f3460]'
+            }`}
             onMouseDown={() => handleMouseDown(r, c, cell)}
             onMouseEnter={() => handleMouseEnter(r, c, cell)}
           />
